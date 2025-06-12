@@ -2,6 +2,13 @@
 
 Una aplicación web desarrollada con Flask que utiliza redes neuronales para clasificar reseñas de sistemas informáticos en sentimientos: **Positivo**, **Negativo** o **Neutral**. Para esto, se utilizó el mismo entrenamiento de red neuronal utilizando en la actividad práctica evaluativa N° 2.
 
+## 👥 Integrantes del Proyecto
+- Botta, Francisco: bottafrancisco01@gmail.com
+- Carnino, Martin: tinchoogd01@gmail.com
+- Griffone, Bruno: brunogriffone15@gmail.com 
+- Gimenez, Tomás: tomasgimenez7.tg@gmail.com
+- Sanchez, Facundo: facusanchez105@gmail.com
+
 ## 📋 Descripción del Proyecto
 
 Este proyecto académico implementa un clasificador de sentimientos usando:

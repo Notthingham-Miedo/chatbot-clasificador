@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clasificador de Reseñas - Sistemas Informáticos</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='style.css') }}"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <div class="row mt-4 mb-4">
+        <div class="col-12 text-center">
+          <h1 class="display-4 text-primary">
+            <i class="fas fa-brain me-3"></i>
+            Clasificador de Reseñas
+          </h1>
+          <p class="lead text-muted">
+            Analiza el sentimiento de reseñas sobre sistemas informáticos
+          </p>
+        </div>
+      </div>
+
+      <!-- Formulario Principal -->
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0">
+                <i class="fas fa-comment-dots me-2"></i>
+                Ingresa tu reseña
+              </h5>
+            </div>
+            <div class="card-body p-4">
+              <form id="reviewForm">
+                <div class="mb-3">
+                  <label for="reviewText" class="form-label fw-bold">
+                    Escribe tu reseña sobre un sistema informático:
+                  </label>
+                  <textarea
+                    class="form-control form-control-lg"
+                    id="reviewText"
+                    rows="4"
+                    placeholder="Ejemplo: Este software es muy fácil de usar y tiene una interfaz intuitiva..."
+                    required
+                  ></textarea>
+                  <div class="form-text">
+                    Comparte tu opinión sobre software, aplicaciones, sistemas
+                    web, etc.
+                  </div>
+                </div>
+
+                <div class="d-grid">
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-lg"
+                    id="analyzeBtn"
+                  >
+                    <i class="fas fa-search me-2"></i>
+                    Analizar Sentimiento
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resultado -->
+      <div
+        class="row justify-content-center mt-4"
+        id="resultContainer"
+        style="display: none;"
+      >
+        <div class="col-lg-8" style="margin: auto;">
+          <div class="card shadow-lg border-0" id="resultCard">
+            <div class="card-header" id="resultHeader">
+              <h5 class="mb-0">
+                <i class="fas fa-chart-line me-2"></i>
+                Resultado del Análisis
+              </h5>
+            </div>
+            <div class="card-body p-4 text-center">
+              <div id="sentimentResult"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ejemplos -->
+      <div class="row justify-content-center mt-5">
+        <div class="col-lg-10">
+          <div class="card border-0">
+            <div class="card-body">
+              <h6 class="card-title text-center mb-3">
+                <i class="fas fa-lightbulb me-2"></i>
+                Ejemplos de reseñas:
+              </h6>
+              <div class="row">
+                <div class="col-md-4 mb-2">
+                  <button
+                    class="btn btn-outline-success btn-sm w-100 example-btn"
+                    data-example="Este sistema de gestión es excelente, muy intuitivo y eficiente para nuestro trabajo diario"
+                  >
+                    <i class="fas fa-thumbs-up me-1"></i>
+                    Ejemplo Positivo
+                  </button>
+                </div>
+                <div class="col-md-4 mb-2">
+                  <button
+                    class="btn btn-outline-warning btn-sm w-100 example-btn"
+                    data-example="El software funciona bien, cumple con lo básico pero podría mejorar la interfaz"
+                  >
+                    <i class="fas fa-meh me-1"></i>
+                    Ejemplo Neutral
+                  </button>
+                </div>
+                <div class="col-md-4 mb-2">
+                  <button
+                    class="btn btn-outline-danger btn-sm w-100 example-btn"
+                    data-example="Esta aplicación es terrible, muy lenta y con muchos errores constantemente"
+                  >
+                    <i class="fas fa-thumbs-down me-1"></i>
+                    Ejemplo Negativo
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="row mt-5 mb-3">
+        <div class="col-12 text-center text-muted">
+          <small>
+            <i class="fas fa-graduation-cap me-1"></i>
+            Proyecto Universitario - Clasificación con Redes Neuronales
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div
+      class="modal fade"
+      id="loadingModal"
+      tabindex="-1"
+      aria-hidden="true"
+      data-bs-backdrop="static"
+      data-bs-keyboard="false"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body text-center p-4">
+            <div class="spinner-border text-primary mb-3" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="mb-0">Analizando reseña...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const form = document.getElementById("reviewForm");
+      const reviewText = document.getElementById("reviewText");
+      const resultContainer = document.getElementById("resultContainer");
+      const resultCard = document.getElementById("resultCard");
+      const resultHeader = document.getElementById("resultHeader");
+      const sentimentResult = document.getElementById("sentimentResult");
+      const loadingModal = new bootstrap.Modal(
+        document.getElementById("loadingModal")
+      );
+      const analyzeBtn = document.getElementById("analyzeBtn");
+
+      // Manejar envío del formulario
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const texto = reviewText.value.trim();
+        if (!texto) {
+          alert("Por favor ingresa una reseña válida");
+          return;
+        }
+
+        // Mostrar loading
+        // loadingModal.show();
+        analyzeBtn.disabled = true;
+
+        try {
+          const response = await fetch("/predecir", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ texto: texto }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            mostrarResultado(data);
+          } else {
+            mostrarError(data.error || "Error desconocido");
+          }
+        } catch (error) {
+          mostrarError("Error de conexión: " + error.message);
+        } finally {
+          // loadingModal.hide();
+          analyzeBtn.disabled = false;
+        }
+      });
+
+      // Mostrar resultado
+      function mostrarResultado(data) {
+        const { sentimiento, porcentaje, info } = data;
+
+        // Configurar colores del card
+        resultCard.className = "card shadow-lg border-0";
+        resultHeader.style.backgroundColor = info.color;
+        resultHeader.style.color = "white";
+
+        // Crear contenido del resultado
+        sentimentResult.innerHTML = `
+                <div class="mb-4">
+                    <div class="display-1 mb-3">${info.emoji}</div>
+                    <h3 class="text-${getSentimentClass(sentimiento)}">${
+          info.descripcion
+        }</h3>
+                    <p class="lead">Confianza: ${porcentaje}</p>
+                </div>
+                <div class="progress mb-3" style="height: 20px;">
+                    <div class="progress-bar bg-${getSentimentClass(
+                      sentimiento
+                    )}" 
+                         style="width: ${data.confianza * 100}%">
+                        ${porcentaje}
+                    </div>
+                </div>
+                <p class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    El modelo ha clasificado tu reseña con un ${porcentaje} de confianza
+                </p>
+            `;
+
+        // Mostrar resultado
+        resultContainer.style.display = "block";
+        resultContainer.scrollIntoView({ behavior: "smooth" });
+      }
+
+      // Mostrar error
+      function mostrarError(mensaje) {
+        resultCard.className = "card shadow-lg border-danger";
+        resultHeader.style.backgroundColor = "#dc3545";
+        resultHeader.style.color = "white";
+
+        sentimentResult.innerHTML = `
+                <div class="text-danger">
+                    <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                    <h4>Error</h4>
+                    <p>${mensaje}</p>
+                </div>
+            `;
+
+        resultContainer.style.display = "block";
+        resultContainer.scrollIntoView({ behavior: "smooth" });
+      }
+
+      // Obtener clase CSS según sentimiento
+      function getSentimentClass(sentimiento) {
+        const classes = {
+          positivo: "success",
+          negativo: "danger",
+          neutral: "warning",
+        };
+        return classes[sentimiento] || "secondary";
+      }
+
+      // Manejar botones de ejemplo
+      document.querySelectorAll(".example-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          reviewText.value = btn.dataset.example;
+          reviewText.focus();
+        });
+      });
+
+      // Auto-resize textarea
+      reviewText.addEventListener("input", function () {
+        this.style.height = "auto";
+        this.style.height = this.scrollHeight + "px";
+      });
+    </script>
+  </body>
+</html>
